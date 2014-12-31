@@ -73,16 +73,15 @@ use-project /boost : $(boost_current) ;
 path-constant BOOST_NUMPY_PATH : ./external_libs/boost_numpy/Boost.Numpy ;
 use-project /boost/numpy       : ./external_libs/boost_numpy ;
 
-
 # ROOT
-local rootsys = [ os.environ ROOTSYS ] ;
-path-constant ROOT_PATH : $(rootsys) ;
-use-project /ROOT       : ./external_libs/root ;
-type.register-suffixes C : CPP ;  # register .C files for ROOT macros
+#local rootsys = [ os.environ ROOTSYS ] ;
+#path-constant ROOT_PATH : $(rootsys) ;
+#use-project /ROOT       : ./external_libs/root ;
+#type.register-suffixes C : CPP ;  # register .C files for ROOT macros
 
 # RooFit
-path-constant ROOFIT_PATH : $(rootsys) ;
-use-project /RooFit       : ./external_libs/RooFit ;
+#path-constant ROOFIT_PATH : $(rootsys) ;
+#use-project /RooFit       : ./external_libs/RooFit ;
 
 # ----------------------------------------------------------------------#
 # reusable packages 

@@ -32,3 +32,6 @@
 
 # GUI
 .DS_Store
+
+# SWP
+*.swp
