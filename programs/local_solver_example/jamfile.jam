@@ -1,0 +1,17 @@
+# jamfile localsover example 
+# -------------------------------------------------------------------- #
+
+exe local_solver_example
+ : # sources
+   ./source/toy.cpp
+   # dependent packages
+   /localsolver
+ : # requirements
+ : # default-build
+ : # usage-requirements
+ ;
+
+# install libs/exes
+# -------------------------------------------------------------- #
+
+default-install local_solver_example ;

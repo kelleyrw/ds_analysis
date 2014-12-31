@@ -1,0 +1,9 @@
+# localsovler jamfile 
+
+project localsolver
+  : usage-requirements
+    <include>$(LOCALSOLVER_PATH)/include
+  ;
+
+# dynamic libs
+lib liblocalsolver : : <name>localsolver <search>$(LOCALSOLVER_PATH)/bin ;

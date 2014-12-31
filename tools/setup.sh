@@ -14,4 +14,3 @@ echo -e "\n\nInstalling Boost.Numpy"
 ./setup_boost_numpy.sh
 
 popd
-
