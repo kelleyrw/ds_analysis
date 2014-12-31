@@ -1,0 +1,41 @@
+import python ;
+import regex ;
+
+project boost/numpy
+  : source-location $(BOOST_NUMPY_PATH)
+  : requirements
+  ;
+
+rule numpy-includes ( properties * )
+{
+  import feature ;
+  local python-interpreter = [ feature.get-values python.interpreter : $(properties) ] ;
+  if $(python-interpreter)
+  {
+    local full-cmd = $(python-interpreter)" -c \"from numpy.distutils import misc_util; import sys; sys.stdout.write(':'.join(misc_util.get_numpy_include_dirs()))\" " ;
+    local output   = [ SHELL $(full-cmd) ] ;
+    local includes = [ regex.split $(output) ":" ] ;
+    return <include>$(includes) ;
+  }
+}
+
+lib boost_numpy
+  : # sources
+  $(BOOST_NUMPY_PATH)/libs/numpy/src/dtype.cpp
+  $(BOOST_NUMPY_PATH)/libs/numpy/src/scalars.cpp
+  $(BOOST_NUMPY_PATH)/libs/numpy/src/ndarray.cpp
+  $(BOOST_NUMPY_PATH)/libs/numpy/src/matrix.cpp
+  $(BOOST_NUMPY_PATH)/libs/numpy/src/ufunc.cpp
+  $(BOOST_NUMPY_PATH)/libs/numpy/src/numpy.cpp
+  : # requirements
+  <include>$(BOOST_NUMPY_PATH)
+  <library>/boost/python//boost_python
+  <conditional>@numpy-includes
+  : # default build
+  <link>shared
+  : # usage requirements
+  <include>$(BOOST_NUMPY_PATH)
+  <conditional>@numpy-includes
+  ;
+
+default-install boost_numpy ;

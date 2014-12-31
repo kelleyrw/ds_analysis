@@ -1,0 +1,30 @@
+# ROOT jamfile 
+
+project ROOT
+  : usage-requirements
+    <include>$(ROOT_PATH)/include
+  ;
+
+# dynamic libs
+lib libm          : : <name>m  <link>shared ;
+lib libdl         : : <name>dl <link>shared ;
+#lib libCore       : : <name>Core       <search>$(ROOT_PATH)/lib  <use>libCint <link>shared ;
+#lib libCint       : : <name>Cint       <search>$(ROOT_PATH)/lib  <use>libdl   <link>shared ;
+lib libCore       : : <name>Core       <search>$(ROOT_PATH)/lib  <link>shared ;
+lib libRIO        : : <name>RIO        <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libNet        : : <name>Net        <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libHist       : : <name>Hist       <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libGraf       : : <name>Graf       <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libGraf3d     : : <name>Graf3d     <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libGpad       : : <name>Gpad       <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libTree       : : <name>Tree       <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libRint       : : <name>Rint       <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libPostscript : : <name>Postscript <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libMatrix     : : <name>Matrix     <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libPhysics    : : <name>Physics    <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libMathCore   : : <name>MathCore   <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libThread     : : <name>Thread     <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+lib libEG         : : <name>EG         <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+#lib libGenVector  : : <name>GenVector  <search>$(ROOT_PATH)/lib  <use>libCore <use>libCint <link>shared ;
+lib libGenVector  : : <name>GenVector  <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;
+#lib libEGPythia6  : : <name>EGPythia6  <search>$(ROOT_PATH)/lib  <use>libCore <link>shared ;

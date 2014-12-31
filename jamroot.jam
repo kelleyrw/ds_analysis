@@ -1,0 +1,97 @@
+# jamroot for DS_ANALYSIS project
+
+# imports 
+# ----------------------------------------------------------------------#
+# compiler setup
+# ----------------------------------------------------------------------#
+
+# use clang with C++11 and libc++
+#using clang-darwin
+#  : c++11 
+#  : "clang++" 
+#  : <cxxflags>-std=c++11 <cxxflags>-stdlib=libc++ ; 
+
+# change the suffix from dylib to so on MACOSX
+import type ;
+#type.change-generated-target-suffix SHARED_LIB : <target-os>darwin : so ;
+
+# ----------------------------------------------------------------------#
+# Python configuration.
+# ----------------------------------------------------------------------#
+
+# Configure specific Python version.
+#using python
+#  : 2.7 
+#  : /Applications/Canopy.app/appdata/canopy-1.4.1.1975.macosx-x86_64/Canopy.app/Contents/bin/python
+#  : /Applications/Canopy.app/appdata/canopy-1.4.1.1975.macosx-x86_64/Canopy.app/Contents/include/python2.7
+#  : /Applications/Canopy.app/appdata/canopy-1.4.1.1975.macosx-x86_64/Canopy.app/Contents/lib
+#  ;
+
+# ----------------------------------------------------------------------#
+# project setup
+# ----------------------------------------------------------------------#
+
+import ./tools/default-install ;
+import ./tools/rootcint ;
+#import ./tools/numpy_includes ; not working yet
+import os ;
+
+# path to project
+path-constant DS_ANALYSIS : ./ ;
+
+# build directory
+path-constant build-dir : ./bin/temp ;
+
+# install exe directory
+path-constant install-dir : ./bin ;
+
+# install lib directory
+path-constant install-lib : ./lib ;
+
+# define the project
+project ds_analysis
+  : build-dir
+    $(build-dir)
+  : default-build release
+  ;
+
+set-install-dir $(install-dir) ;
+
+# ----------------------------------------------------------------------#
+# External Sources and programs
+# ----------------------------------------------------------------------#
+
+# BOOST
+local boost_current = [ os.environ BOOST_ROOT ] ;
+use-project /boost : $(boost_current) ;
+
+# PyUblas
+#path-constant PYUBLAS_PATH : ./external_libs/pyublas/v2013.1 ;
+#use-project /pyublas       : ./external_libs/pyublas ;
+
+# Boost.Numpy: https://github.com/ndarray/Boost.NumPy
+path-constant BOOST_NUMPY_PATH : ./external_libs/boost_numpy/Boost.Numpy ;
+use-project /boost/numpy       : ./external_libs/boost_numpy ;
+
+
+# ROOT
+local rootsys = [ os.environ ROOTSYS ] ;
+path-constant ROOT_PATH : $(rootsys) ;
+use-project /ROOT       : ./external_libs/root ;
+type.register-suffixes C : CPP ;  # register .C files for ROOT macros
+
+# RooFit
+path-constant ROOFIT_PATH : $(rootsys) ;
+use-project /RooFit       : ./external_libs/RooFit ;
+
+# ----------------------------------------------------------------------#
+# reusable packages 
+# ----------------------------------------------------------------------#
+
+# SimpleTable
+#path-constant SIMPLETABLE_PATH : ./packages/SimpleTable ;
+#use-project /SimpleTable       : ./packages/SimpleTable ;
+
+# ROOT tools
+#path-constant ROOTTOOLS : ./packages/RootTools ;
+#use-project /RootTools  : ./packages/RootTools ;

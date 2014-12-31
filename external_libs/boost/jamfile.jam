@@ -1,0 +1,68 @@
+# BOOST jamfile 
+
+project BOOST
+  : usage-requirements
+    <include>$(BOOST_PATH)/include
+  ;
+
+# libs
+lib atomic-mt              : : <name>boost_atomic-mt              <search>$(BOOST_PATH)/lib ; 
+lib chrono-mt              : : <name>boost_chrono-mt              <search>$(BOOST_PATH)/lib ; 
+lib chrono                 : : <name>boost_chrono                 <search>$(BOOST_PATH)/lib ; 
+lib container-mt           : : <name>boost_container-mt           <search>$(BOOST_PATH)/lib ; 
+lib container              : : <name>boost_container              <search>$(BOOST_PATH)/lib ; 
+lib context-mt             : : <name>boost_context-mt             <search>$(BOOST_PATH)/lib ; 
+lib context                : : <name>boost_context                <search>$(BOOST_PATH)/lib ; 
+lib coroutine-mt           : : <name>boost_coroutine-mt           <search>$(BOOST_PATH)/lib ; 
+lib coroutine              : : <name>boost_coroutine              <search>$(BOOST_PATH)/lib ; 
+lib date_time-mt           : : <name>boost_date_time-mt           <search>$(BOOST_PATH)/lib ; 
+lib date_time              : : <name>boost_date_time              <search>$(BOOST_PATH)/lib ; 
+lib filesystem-mt          : : <name>boost_filesystem-mt          <search>$(BOOST_PATH)/lib ; 
+lib filesystem             : : <name>boost_filesystem             <search>$(BOOST_PATH)/lib ; 
+lib graph-mt               : : <name>boost_graph-mt               <search>$(BOOST_PATH)/lib ; 
+lib graph                  : : <name>boost_graph                  <search>$(BOOST_PATH)/lib ; 
+lib iostreams-mt           : : <name>boost_iostreams-mt           <search>$(BOOST_PATH)/lib ; 
+lib iostreams              : : <name>boost_iostreams              <search>$(BOOST_PATH)/lib ; 
+lib locale-mt              : : <name>boost_locale-mt              <search>$(BOOST_PATH)/lib ; 
+lib log-mt                 : : <name>boost_log-mt                 <search>$(BOOST_PATH)/lib ; 
+lib log                    : : <name>boost_log                    <search>$(BOOST_PATH)/lib ; 
+lib log_setup-mt           : : <name>boost_log_setup-mt           <search>$(BOOST_PATH)/lib ; 
+lib log_setup              : : <name>boost_log_setup              <search>$(BOOST_PATH)/lib ; 
+lib math_c99-mt            : : <name>boost_math_c99-mt            <search>$(BOOST_PATH)/lib ; 
+lib math_c99               : : <name>boost_math_c99               <search>$(BOOST_PATH)/lib ; 
+lib math_c99f-mt           : : <name>boost_math_c99f-mt           <search>$(BOOST_PATH)/lib ; 
+lib math_c99f              : : <name>boost_math_c99f              <search>$(BOOST_PATH)/lib ; 
+lib math_c99l-mt           : : <name>boost_math_c99l-mt           <search>$(BOOST_PATH)/lib ; 
+lib math_c99l              : : <name>boost_math_c99l              <search>$(BOOST_PATH)/lib ; 
+lib math_tr1-mt            : : <name>boost_math_tr1-mt            <search>$(BOOST_PATH)/lib ; 
+lib math_tr1               : : <name>boost_math_tr1               <search>$(BOOST_PATH)/lib ; 
+lib math_tr1f-mt           : : <name>boost_math_tr1f-mt           <search>$(BOOST_PATH)/lib ; 
+lib math_tr1f              : : <name>boost_math_tr1f              <search>$(BOOST_PATH)/lib ; 
+lib math_tr1l-mt           : : <name>boost_math_tr1l-mt           <search>$(BOOST_PATH)/lib ; 
+lib math_tr1l              : : <name>boost_math_tr1l              <search>$(BOOST_PATH)/lib ; 
+lib prg_exec_monitor-mt    : : <name>boost_prg_exec_monitor-mt    <search>$(BOOST_PATH)/lib ; 
+lib prg_exec_monitor       : : <name>boost_prg_exec_monitor       <search>$(BOOST_PATH)/lib ; 
+lib program_options-mt     : : <name>boost_program_options-mt     <search>$(BOOST_PATH)/lib ; 
+lib program_options        : : <name>boost_program_options        <search>$(BOOST_PATH)/lib ; 
+lib python-mt              : : <name>boost_python-mt              <search>$(BOOST_PATH)/lib ; 
+lib python                 : : <name>boost_python                 <search>$(BOOST_PATH)/lib ; 
+lib random-mt              : : <name>boost_random-mt              <search>$(BOOST_PATH)/lib ; 
+lib random                 : : <name>boost_random                 <search>$(BOOST_PATH)/lib ; 
+lib regex-mt               : : <name>boost_regex-mt               <search>$(BOOST_PATH)/lib ; 
+lib regex                  : : <name>boost_regex                  <search>$(BOOST_PATH)/lib ; 
+lib serialization-mt       : : <name>boost_serialization-mt       <search>$(BOOST_PATH)/lib ; 
+lib serialization          : : <name>boost_serialization          <search>$(BOOST_PATH)/lib ; 
+lib signals-mt             : : <name>boost_signals-mt             <search>$(BOOST_PATH)/lib ; 
+lib signals                : : <name>boost_signals                <search>$(BOOST_PATH)/lib ; 
+lib system-mt              : : <name>boost_system-mt              <search>$(BOOST_PATH)/lib ; 
+lib system                 : : <name>boost_system                 <search>$(BOOST_PATH)/lib ; 
+lib thread-mt              : : <name>boost_thread-mt              <search>$(BOOST_PATH)/lib ; 
+lib timer-mt               : : <name>boost_timer-mt               <search>$(BOOST_PATH)/lib ; 
+lib timer                  : : <name>boost_timer                  <search>$(BOOST_PATH)/lib ; 
+lib unit_test_framework-mt : : <name>boost_unit_test_framework-mt <search>$(BOOST_PATH)/lib ; 
+lib unit_test_framework    : : <name>boost_unit_test_framework    <search>$(BOOST_PATH)/lib ; 
+lib wave-mt                : : <name>boost_wave-mt                <search>$(BOOST_PATH)/lib ; 
+lib wave                   : : <name>boost_wave                   <search>$(BOOST_PATH)/lib ; 
+lib wserialization-mt      : : <name>boost_wserialization-mt      <search>$(BOOST_PATH)/lib ; 
+lib wserialization         : : <name>boost_wserialization         <search>$(BOOST_PATH)/lib ; 
+

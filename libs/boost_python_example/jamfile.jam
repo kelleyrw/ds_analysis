@@ -1,0 +1,27 @@
+#using python ;
+
+python-extension hello_ext
+ : # sources
+   ./source/hello.cpp 
+   # dependent packages
+   #/boost//python
+   /boost/python//boost_python
+ : # requirements
+ : # default-build
+ : # usage-requirements
+ ;
+
+python-extension example
+ : # sources
+   ./source/wrap.cpp 
+   # dependent packages
+   #/boost//python
+   /boost/python//boost_python
+   /boost/numpy//boost_numpy
+ : # requirements
+ : # default-build
+ : # usage-requirements
+ ;
+
+default-install hello_ext ;
+default-install example ;

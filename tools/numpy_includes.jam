@@ -1,0 +1,18 @@
+# rule to generate the numpy include path 
+
+rule numpy-includes ( properties * )
+{
+  import feature ;
+  import python ;
+  import regex ;
+  local python-interpreter = [ feature.get-values python.interpreter : $(properties) ] ;
+  if $(python-interpreter)
+  {
+    local full-cmd = $(python-interpreter)" -c \"from numpy.distutils import misc_util; import sys; sys.stdout.write(':'.join(misc_util.get_numpy_include_dirs()))\" " ;
+    local output   = [ SHELL $(full-cmd) ] ;
+    local includes = [ regex.split $(output) ":" ] ;
+    return <include>$(includes) ;
+  }
+}
+
+IMPORT $(__name__) : numpy-includes : : numpy-includes ;

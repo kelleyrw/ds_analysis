@@ -1,0 +1,70 @@
+# rule to generate the ROOT dictionaries in BOOST.BUILD
+
+import feature ;
+import property-set ;
+import generate ;
+import "class" : new ;
+import path ;
+
+feature.feature header  : : free ;
+feature.feature linkdef : : free ;
+
+actions rootcint-action
+{
+    #echo ----- rootcint: Source Files -----
+    #echo $(>)
+    #echo ----- rootcint: Output Files -----
+    #echo $(<)
+
+    #echo ----- rootcint: Command -----
+    #echo rootcint -v3 -f $(<) -c $(>)
+    rootcint -v3 -f $(<) -c $(>)
+}
+
+rule rootcint-command ( target : sources * : properties * )
+{
+    local ps = [ property-set.create $(properties) ] ;
+    local defines  = [ $(ps).get <define>  ] ;
+    local linkdef  = [ $(ps).get <linkdef> ] ;
+    local includes = [ $(ps).get <include> ] ;
+    local headers  = [ $(ps).get <header>  ] ;
+    if $(linkdef) != ""
+    {
+      local linkdef_tmp = [ path.basename $(linkdef) ] ;
+    }
+    else
+    {
+      local linkdef_tmp ;
+    }
+
+    for local source in $(sources)
+    {
+      local source_tmp = [ path.basename $(source) ] ;
+      if $(source_tmp) != $(linkdef_tmp) { headers += $(source_tmp) ; }
+    }
+
+    local defines-list  = -D$(defines:J=" -D") ;
+    local includes-list = -I$(includes:J=" -I") ;
+
+    local args = $(defines-list) $(includes-list) $(headers) $(linkdef_tmp) ;
+    rootcint-action $(target) : $(args) ;
+}
+
+rule rootcint-generating-rule ( project name : property-set : sources * )
+{
+    local a = [ new action $(sources) : rootcint.rootcint-command : $(property-set) ] ;
+    local result = [ new file-target $(name) : CPP : $(project) : $(a) ] ;
+    return $(result) ;
+}
+
+rule rootcint ( name : sources * : requirements * )
+{
+    local ps = [ property-set.create $(requirements) ] ;
+    local linkdefs = [ $(ps).get <linkdef> ] ;
+
+    return [ generate.generate $(name) : $(sources) $(linkdefs) : $(includes-list) $(requirements) <generating-rule>@rootcint.rootcint-generating-rule ] ;
+}
+
+IMPORT $(__name__) : rootcint                 : : rootcint                          ;
+IMPORT $(__name__) : rootcint-generating-rule : : rootcint.rootcint-generating-rule ;
+IMPORT $(__name__) : rootcint-command         : : rootcint.rootcint-command         ;

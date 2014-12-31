@@ -1,0 +1,10 @@
+# RooFit jamfile 
+
+project RooFit
+  : usage-requirements
+    <include>$(ROOFIT_PATH)/include
+  ;
+
+lib libRooFit     : /ROOT : <name>RooFit     <search>$(ROOT_PATH)/lib <link>shared ;
+lib libRooFitCore : /ROOT : <name>RooFitCore <search>$(ROOT_PATH)/lib <link>shared ;
+lib libRooStats   : /ROOT : <name>RooStats   <search>$(ROOT_PATH)/lib <link>shared ;

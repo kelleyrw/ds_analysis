@@ -1,0 +1,18 @@
+# jamfile root example 
+# -------------------------------------------------------------------- #
+
+exe root_example
+ : # sources
+   ./test/root_example.cpp
+   # dependent packages
+   /ROOT
+ : # requirements
+ : # default-build
+ : # usage-requirements
+ ;
+
+# install libs/exes
+# -------------------------------------------------------------- #
+
+default-install root_example ;
+

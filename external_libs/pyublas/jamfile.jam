@@ -1,0 +1,20 @@
+lib pyublas
+  : # sources
+    $(PYUBLAS_PATH)/src/wrapper/converters.cpp
+    $(PYUBLAS_PATH)/src/wrapper/main.cpp
+    $(PYUBLAS_PATH)/src/wrapper/sparse_build.cpp
+    $(PYUBLAS_PATH)/src/wrapper/sparse_execute.cpp
+    /boost//python
+  : # requirements 
+    <include>$(PYUBLAS_PATH)/src/wrapper
+    <include>$(PYUBLAS_PATH)/pyublas/include
+    <include>$(PYTHON_SITE)/numpy/core/include
+    #<define>NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
+    #/boost/python//boost_python
+  : # default-build
+  : # usage-requirements
+    <include>$(PYUBLAS_PATH)/src/wrapper
+    <include>$(PYUBLAS_PATH)/pyublas/include
+    <include>$(PYTHON_SITE)/numpy/core/include
+    #<define>NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
+  ;
