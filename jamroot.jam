@@ -75,7 +75,7 @@ use-project /boost/numpy       : ./external_libs/boost_numpy ;
 
 # localsolver: http://www.localsolver.com/home.html 
 path-constant LOCALSOLVER_PATH : /opt/localsolver_4_5 ;
-use-project localsovler        : ./external_libs/localsolver ;
+use-project localsolver        : ./external_libs/localsolver ;
 
 # ROOT
 #local rootsys = [ os.environ ROOTSYS ] ;

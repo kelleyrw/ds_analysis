@@ -1,0 +1,18 @@
+# jamfile localsover example 
+# -------------------------------------------------------------------- #
+
+python-extension knapsack
+ : # sources
+   ./source/knapsack.cpp
+   # dependent packages
+   /localsolver
+   /boost/python//boost_python
+   /boost/numpy//boost_numpy
+ : # requirements
+ : # default-build
+ : # usage-requirements
+ ;
+
+# install libs/exes
+# -------------------------------------------------------------- #
+default-install knapsack ;
