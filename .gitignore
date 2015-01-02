@@ -35,3 +35,10 @@
 
 # SWP
 *.swp
+
+# bin directory
+bin/*
+
+# third party
+external_libs/boost_numpy/Boost.Numpy
+external_libs/pyublas/v2013.1
