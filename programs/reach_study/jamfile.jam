@@ -13,6 +13,20 @@ python-extension knapsack
  : # usage-requirements
  ;
 
+python-extension localsolver_reach
+ : # sources
+   ./source/localsolver_reach.cpp
+   # dependent packages
+   /localsolver
+   /boost/python//boost_python
+   /boost/numpy//boost_numpy
+ : # requirements
+ : # default-build
+ : # usage-requirements
+ ;
+
+
 # install libs/exes
 # -------------------------------------------------------------- #
 default-install knapsack ;
+default-install localsolver_reach ;
