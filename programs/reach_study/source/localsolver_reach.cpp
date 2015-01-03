@@ -25,10 +25,11 @@ class OptimizeTRP {
             , grps(np_grps) 
             , trps(np_trps) 
             , grp_limit(bp_grp_limit)
-            , solution(np::empty(np_grps.shape(0), 
+            , solution(np::empty(np_grps.get_nd(), 
                                  np_grps.get_shape(), 
                                  np::dtype::get_builtin<int>()))
         {
+            std::cout << "instantiating the class"  << std::endl;
         }
 
         /* Number of spots. */
@@ -51,13 +52,13 @@ class OptimizeTRP {
         //std::vector<int> solution;
         np::ndarray solution;
 
-
         // envoke the solver
         void solve(int time_limit) {
             try {
                 LSModel model = localsolver.getModel();
 
                 // decision variables u[i]
+                std::cout << "number of spots: " << num_spots << std::endl;
                 u.resize(num_spots);
                 for (int i = 0; i < num_spots; i++) {
                     u[i] = model.createExpression(O_Int, lsint(0), lsint(10));
@@ -67,18 +68,22 @@ class OptimizeTRP {
                 }
 
                 // GRP constraint
+                std::cout << "adding constraints" << std::endl;
                 LSExpression grp_sum = model.createExpression(O_Sum);
                 for (int i = 0; i < num_spots; i++) {
-                    LSExpression item_grp = model.createExpression(O_Prod, u[i], static_cast<lsdouble>( bp::extract<double>(grps[i])));
+                    double grp_value = bp::extract<float>(grps[i]);
+                    LSExpression item_grp = model.createExpression(O_Prod, u[i], lsdouble(grp_value));
                     grp_sum.addOperand(item_grp);
                 }    
                 LSExpression grp_constraint = model.createExpression(O_Leq, grp_sum, grp_limit);
                 model.addConstraint(grp_constraint);
 
                 // maximize trp
+                std::cout << "adding objective function" << std::endl;
                 LSExpression trp_sum = model.createExpression(O_Sum);
                 for (int i = 0; i < num_spots; i++) {
-                    LSExpression item_trp = model.createExpression(O_Prod, u[i], static_cast<lsdouble>( bp::extract<double>(trps[i])));
+                    double trp_value = bp::extract<float>(trps[i]);
+                    LSExpression item_trp = model.createExpression(O_Prod, u[i], lsdouble(trp_value));
                     trp_sum.addOperand(item_trp);
                 }
                 model.addObjective(trp_sum, OD_Maximize);
@@ -86,12 +91,16 @@ class OptimizeTRP {
 
                 LSPhase phase = localsolver.createPhase();
                 phase.setTimeLimit(time_limit);
+                
+                std::cout << "i\ncalling local solver" << std::endl;
                 localsolver.solve();
 
                 //solution.clear();
+                std::cout << "i\nprinting and returning solution" << std::endl;
                 for (int i = 0; i < num_spots; ++i)
                 {
                     solution[i] = static_cast<int>(u[i].getValue());
+                    //std::cout << i << " :\t" << u[i].getValue() << " " << std::endl;;
                 }
 
             } catch (LSException *e) {
@@ -119,9 +128,10 @@ np::ndarray optimize
     int const time_limit 
 ) 
 {
+    std::cout << "\nSet up local solver" << std::endl;
     OptimizeTRP model(grps, trps, grp_limit);
+    std::cout << "\nsolving" << std::endl;
     model.solve(time_limit);
-    model.printSolution();
     return model.solution;
 }
 
