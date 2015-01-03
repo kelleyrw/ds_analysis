@@ -9,6 +9,7 @@ python-extension knapsack
    /boost/python//boost_python
    /boost/numpy//boost_numpy
  : # requirements
+   <include>./include
  : # default-build
  : # usage-requirements
  ;
@@ -21,6 +22,7 @@ python-extension localsolver_reach
    /boost/python//boost_python
    /boost/numpy//boost_numpy
  : # requirements
+   <include>./include
  : # default-build
  : # usage-requirements
  ;

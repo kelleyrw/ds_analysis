@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include "localsolver.h"
+#include "NumPyArrayData.hpp" 
 #include <boost/numpy.hpp>
 #include <boost/scoped_array.hpp>
 
@@ -57,6 +58,10 @@ class OptimizeTRP {
             try {
                 LSModel model = localsolver.getModel();
 
+                // ndarray accessor wrappers
+                NumPyArrayData<double> grps_data(grps);
+                NumPyArrayData<double> trps_data(trps);
+
                 // decision variables u[i]
                 std::cout << "number of spots: " << num_spots << std::endl;
                 u.resize(num_spots);
@@ -71,8 +76,9 @@ class OptimizeTRP {
                 std::cout << "adding constraints" << std::endl;
                 LSExpression grp_sum = model.createExpression(O_Sum);
                 for (int i = 0; i < num_spots; i++) {
-                    double grp_value = bp::extract<float>(grps[i]);
-                    LSExpression item_grp = model.createExpression(O_Prod, u[i], lsdouble(grp_value));
+//                     double grp_value = bp::extract<float>(grps[i]);
+//                     LSExpression item_grp = model.createExpression(O_Prod, u[i], lsdouble(grp_value));
+                    LSExpression item_grp = model.createExpression(O_Prod, u[i], lsdouble(grps_data(i)));
                     grp_sum.addOperand(item_grp);
                 }    
                 LSExpression grp_constraint = model.createExpression(O_Leq, grp_sum, grp_limit);
@@ -82,8 +88,9 @@ class OptimizeTRP {
                 std::cout << "adding objective function" << std::endl;
                 LSExpression trp_sum = model.createExpression(O_Sum);
                 for (int i = 0; i < num_spots; i++) {
-                    double trp_value = bp::extract<float>(trps[i]);
-                    LSExpression item_trp = model.createExpression(O_Prod, u[i], lsdouble(trp_value));
+//                     double trp_value = bp::extract<float>(trps[i]);
+//                     LSExpression item_trp = model.createExpression(O_Prod, u[i], lsdouble(trp_value));
+                    LSExpression item_trp = model.createExpression(O_Prod, u[i], lsdouble(trps_data(i)));
                     trp_sum.addOperand(item_trp);
                 }
                 model.addObjective(trp_sum, OD_Maximize);
