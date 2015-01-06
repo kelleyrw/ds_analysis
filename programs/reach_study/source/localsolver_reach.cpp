@@ -6,6 +6,7 @@
 #include "NumPyArrayData.hpp" 
 #include <boost/numpy.hpp>
 #include <boost/scoped_array.hpp>
+#include <cmath>
 
 using namespace localsolver;
 using namespace std;
@@ -131,22 +132,22 @@ class OptimizeTRP {
 class OptimizeReach {
     public:
 
-        // constructor
+        // constructor, with no initial conditions.  Set to all zero
         OptimizeReach
         (
-            np::ndarray const & np_log_p,  // log(p_iP), where i is the individual, and P is a program
+            np::ndarray const & np_p,      // p_iP, where i is the individual, and P is a program
             np::ndarray const & np_w,      // weight of individual i
             np::ndarray const & np_grps,   // gross rating point for "total" audience
             double const bp_grp_limit      // specified limit on delievered GRPs
         )
-            : num_individuals(np_log_p.shape(0))
-            , num_spots(np_log_p.shape(1))
-            , log_p(np_log_p)
+            : num_individuals(np_p.shape(0))
+            , num_spots(np_p.shape(1))
+            , p(np_p)
             , w(np_w)
+            , u0(np::zeros(bp::make_tuple(num_spots), np::dtype::get_builtin<int>()))
             , grps(np_grps) 
             , grp_limit(bp_grp_limit)
-            , solution(np::zeros(bp::make_tuple(num_spots), 
-                                 np::dtype::get_builtin<int>()))
+            , solution(np::zeros(bp::make_tuple(num_spots), np::dtype::get_builtin<int>()))
         {
             std::cout << "instantiating an Optimize Reach class"  << std::endl;
             std::cout << "number of individuals: " << num_individuals << std::endl;
@@ -155,13 +156,39 @@ class OptimizeReach {
             std::cout << "dim of w = (" << w.shape(0) << ", " << w.shape(1) << ")" << std::endl;
         }
 
+        // with initial conditions
+        OptimizeReach
+        (
+            np::ndarray const & np_p,      // p_iP, where i is the individual, and P is a program
+            np::ndarray const & np_w,      // weight of individual i
+            np::ndarray const & np_u0,     // initial unit counts  
+            np::ndarray const & np_grps,   // gross rating point for "total" audience
+            double const bp_grp_limit      // specified limit on delievered GRPs
+        )
+            : num_individuals(np_p.shape(0))
+            , num_spots(np_p.shape(1))
+            , p(np_p)
+            , w(np_w)
+            , u0(np_u0)
+            , grps(np_grps) 
+            , grp_limit(bp_grp_limit)
+            , solution(np::zeros(bp::make_tuple(num_spots), 
+                                 np::dtype::get_builtin<int>()))
+        {
+            std::cout << "instantiating an Optimize Reach class"  << std::endl;
+            std::cout << "number of individuals: " << num_individuals << std::endl;
+            std::cout << "number of spots: "       << num_spots << std::endl;
+            std::cout << "dim of w = (" << w.shape(0) << ", " << w.shape(1) << ")" << std::endl;
+        }
+
         /* Number of individuals and spots. */
         int num_individuals;
         int num_spots;
 
         /* Total impressions in GRPs*/
-        np::ndarray log_p;
+        np::ndarray p;
         np::ndarray w;
+        np::ndarray u0;
         np::ndarray grps;
 
         /* GRP bound */
@@ -183,8 +210,10 @@ class OptimizeReach {
                 LSModel model = localsolver.getModel();
 
                 // ndarray accessor wrappers
-                NumPyArrayData<double> log_p_data(log_p);
+                //NumPyArrayData<double> log_p_data(log_p);
+                NumPyArrayData<double> p_data(p);
                 NumPyArrayData<double> w_data(w);
+                NumPyArrayData<int> u0_data(u0);
                 NumPyArrayData<double> grps_data(grps);
 
                 // decision variables u[i]
@@ -232,7 +261,7 @@ class OptimizeReach {
                     for (int P = 0; P < num_spots; P++) 
                     {
                         // building summand for P sum 
-                        LSExpression term_logPU = model.createExpression(O_Prod, u[P], lsdouble(log_p_data(i,P)));
+                        LSExpression term_logPU = model.createExpression(O_Prod, u[P], lsdouble(log(1.0 - p_data(i,P))));
                         sum_logPU.addOperand(term_logPU);
                     }
 
@@ -259,12 +288,19 @@ class OptimizeReach {
 
                 // set the annealing level
                 localsolver.getParam().setAnnealingLevel(annealing_level);
-                
+
+                // set initial conditions
+                for (int P = 0; P < num_spots; P++) 
+                {
+                    u[P].setValue(lsint(u0_data(P)));
+                }
+               
+                // call the optimizer
                 std::cout << "\ncalling local solver" << std::endl;
                 localsolver.solve();
 
-                //solution.clear();
-                std::cout << "\nprinting and returning solution" << std::endl;
+                // return the solution
+                std::cout << "\nreturning solution" << std::endl;
                 for (int P = 0; P < num_spots; ++P)
                 {
                     solution[P] = static_cast<int>(u[P].getValue());
@@ -322,35 +358,53 @@ np::ndarray optimizeReach
     return model.solution;
 }
 
-
-void test_numpy_wrapper( np::ndarray input_array)
+np::ndarray optimizeReach_withICs
+(
+    np::ndarray const & log_p,
+    np::ndarray const & w,
+    np::ndarray const & u0,
+    np::ndarray const & grps, 
+    double const grp_limit, 
+    int const time_limit = 10,
+    int const annealing_level = 0
+) 
 {
-    int num_rows = input_array.shape(0);
-    int num_cols = input_array.shape(1);
-
-    NumPyArrayData<double> wrapped_array(input_array);
-
-    std::cout << "\nM = [\t";
-    for (int i = 0; i < num_rows; ++i)
-    {
-        if( i != 0) 
-        {
-            std::cout << "\t"; 
-        }
-        for (int j = 0; j < num_cols; ++j)
-        {
-            std::cout << " " << wrapped_array(i,j);
-        }
-        if( i == num_rows - 1) 
-        {
-            std::cout << " ]\n" <<  std::endl;
-        } 
-        else
-        {
-            std::cout <<  std::endl;
-        }
-    }
+    std::cout << "\nSet up local solver to maximize Reach" << std::endl;
+    OptimizeReach model(log_p, w, u0, grps, grp_limit);
+    std::cout << "\nsolving" << std::endl;
+    model.solve(time_limit, annealing_level);
+    return model.solution;
 }
+
+
+//void test_numpy_wrapper( np::ndarray input_array)
+//{
+//    int num_rows = input_array.shape(0);
+//    int num_cols = input_array.shape(1);
+//
+//    NumPyArrayData<double> wrapped_array(input_array);
+//
+//    std::cout << "\nM = [\t";
+//    for (int i = 0; i < num_rows; ++i)
+//    {
+//        if( i != 0) 
+//        {
+//            std::cout << "\t"; 
+//        }
+//        for (int j = 0; j < num_cols; ++j)
+//        {
+//            std::cout << " " << wrapped_array(i,j);
+//        }
+//        if( i == num_rows - 1) 
+//        {
+//            std::cout << " ]\n" <<  std::endl;
+//        } 
+//        else
+//        {
+//            std::cout <<  std::endl;
+//        }
+//    }
+//}
                 
                 
 
@@ -358,5 +412,6 @@ BOOST_PYTHON_MODULE(localsolver_reach) {
     np::initialize();  // have to put this in any module that uses Boost.NumPy
     bp::def("optimizeTRP", optimizeTRP);
     bp::def("optimizeReach", optimizeReach);
-    bp::def("test", test_numpy_wrapper);
+    bp::def("optimizeReach_withICs", optimizeReach_withICs);
+    //bp::def("test", test_numpy_wrapper);
 }
