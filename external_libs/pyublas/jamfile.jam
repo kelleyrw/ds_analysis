@@ -1,3 +1,27 @@
+# PyUblas jamfile 
+
+import python ;
+import regex ;
+
+project pyublas
+  : usage-requirements
+    <include>$(PYUBLAS_PATH)/src/wrapper
+    <include>$(PYUBLAS_PATH)/pyublas/include
+  ;
+
+rule numpy-includes ( properties * )
+{
+  import feature ;
+  local python-interpreter = [ feature.get-values python.interpreter : $(properties) ] ;
+  if $(python-interpreter)
+  {
+    local full-cmd = $(python-interpreter)" -c \"from numpy.distutils import misc_util; import sys; sys.stdout.write(':'.join(misc_util.get_numpy_include_dirs()))\" " ;
+    local output   = [ SHELL $(full-cmd) ] ;
+    local includes = [ regex.split $(output) ":" ] ;
+    return <include>$(includes) ;
+  }
+}
+
 lib pyublas
   : # sources
     $(PYUBLAS_PATH)/src/wrapper/converters.cpp
@@ -8,13 +32,13 @@ lib pyublas
   : # requirements 
     <include>$(PYUBLAS_PATH)/src/wrapper
     <include>$(PYUBLAS_PATH)/pyublas/include
-    <include>$(PYTHON_SITE)/numpy/core/include
+    <conditional>@numpy-includes
     #<define>NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
     #/boost/python//boost_python
   : # default-build
   : # usage-requirements
     <include>$(PYUBLAS_PATH)/src/wrapper
     <include>$(PYUBLAS_PATH)/pyublas/include
-    <include>$(PYTHON_SITE)/numpy/core/include
+    <conditional>@numpy-includes
     #<define>NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
   ;
