@@ -21,11 +21,22 @@ python-extension example
  : # usage-requirements
  ;
 
-python-extension pyublas_example
+#python-extension pyublas_example
+# : # sources
+#   ./source/pyublas_example.cpp 
+#   # dependent packages
+#   /pyublas
+#   /boost/python//boost_python
+#   /boost/numpy//boost_numpy
+# : # requirements
+# : # default-build
+# : # usage-requirements
+# ;
+
+python-extension dict_example
  : # sources
-   ./source/pyublas_example.cpp 
+   ./source/dict_example.cpp 
    # dependent packages
-   /pyublas
    /boost/python//boost_python
    /boost/numpy//boost_numpy
  : # requirements
@@ -35,4 +46,5 @@ python-extension pyublas_example
 
 default-install hello_ext ;
 default-install example ;
-default-install pyublas_example ;
+#default-install pyublas_example ;
+default-install dict_example ;
