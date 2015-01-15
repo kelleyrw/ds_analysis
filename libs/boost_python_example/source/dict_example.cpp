@@ -54,17 +54,16 @@ void pass_dict_np(boost::python::object const &pydict)
     for(int i = 0; i < len; ++i)
     {
         // operator[] is in python::boost::object
-        std::string const key_str = extract<std::string>(str(keylist[i]     ));
+        std::string const key_str   = extract<std::string>(str(keylist[i]     ));
         np::ndarray const val_array = extract<np::ndarray>(cppdict[keylist[i]]);
-//         std::cout << "key:[" << key_str << "]->[" << val_array.shape(0) << "]" << std::endl;
-//         std::cout << "key:[" << key_str << "]->[" << val_array.shape(0) << "]" << std::endl;
+        std::cout << "key:[" << key_str << "]->[" << val_array.shape(0) << "]" << std::endl;
     }
 }
 
 
 BOOST_PYTHON_MODULE(dict_example)
 {
-//     np::initialize();  // have to put this in any module that uses Boost.NumPy
+    np::initialize();  // have to put this in any module that uses Boost.NumPy
     boost::python::def("pass_dict"   , pass_dict);
     boost::python::def("pass_dict_np", pass_dict_np);
 }
