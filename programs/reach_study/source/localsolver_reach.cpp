@@ -242,15 +242,15 @@ class OptimizeReach {
 
 
                 // maximize for Reach
-                // build the target universe
-                double target_universe = 0.0; 
+                // build the possible universe
+                double possible_universe = 0.0; 
 
                 // buld outer summation over individuals
                 LSExpression sum_Individuals = model.createExpression(O_Sum);
                 for (int i = 0; i < num_individuals; i++) 
                 {
                     // update universe
-                    target_universe += w_data(i,0);
+                    possible_universe += w_data(i,0);
 
                     // for each individual, loop over the programs P
                     // build argument of the exponential
@@ -273,8 +273,8 @@ class OptimizeReach {
                     sum_Individuals.addOperand(term_wlogPU);
                 }
 
-                // devide by target universe
-                sum_Individuals = model.createExpression(O_Div, sum_Individuals, lsdouble(target_universe));
+                // divide by possible universe
+                sum_Individuals = model.createExpression(O_Div, sum_Individuals, lsdouble(possible_universe));
 
                 // subtract summation from 1.0
                 LSExpression Objective_function = model.createExpression(O_Sub, lsdouble(1.0), sum_Individuals);
