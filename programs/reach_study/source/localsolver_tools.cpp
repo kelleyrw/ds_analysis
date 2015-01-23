@@ -22,13 +22,17 @@ class OptimizeGeneral {
             boost::python::dict const & prob_data_pydict,        // python dictionary of viewership probability
             boost::python::dict const & weight_data_pydict,      // python dictionary of weight data
             boost::python::dict const & constraints_data_pydict, // python dictionary of constraints data
-            np::ndarray const & np_u0                            // Initial Conditions
+            boost::python::dict const & priorities_data_pydict,  // python dictionary of priority data, keyed by media_plan_id
+            np::ndarray const & np_u0,                           // Initial Conditions
+            np::ndarray const & np_recency_score                 // recency score
         )
-            : prob_data(   prob_data_pydict)                // extract the python dict to a c++ boost::python::dict
-            , weight_data( weight_data_pydict)              // extract the python dict to a c++ boost::python::dict
-            , constraints_data( constraints_data_pydict)    // extract the python dict to a c++ boost::python::dict
+            : prob_data( prob_data_pydict)                // extract the python dict to a c++ boost::python::dict
+            , weight_data( weight_data_pydict)            // extract the python dict to a c++ boost::python::dict
+            , constraints_data( constraints_data_pydict)  // extract the python dict to a c++ boost::python::dict
+            , priorities_data( priorities_data_pydict)    // extract the python dict to a c++ boost::python::dict
             , media_plans( prob_data.keys())                              
-            , u0(np_u0)
+            , u0( np_u0)
+            , recency_score(np_recency_score)
             , constraint_lhs_index       (bp::extract<np::ndarray>(constraints_data["lhs_index"]))
             , constraint_lhs_variable_id (bp::extract<np::ndarray>(constraints_data["lhs_variable_id"]))      
             , constraint_lhs_coeff       (bp::extract<np::ndarray>(constraints_data["lhs_coeff"]))
@@ -60,10 +64,14 @@ class OptimizeGeneral {
         boost::python::dict const prob_data;
         boost::python::dict const weight_data;
         boost::python::dict const constraints_data;
+        boost::python::dict const priorities_data;
         boost::python::list const media_plans;    // keys of the prob_data and weight_data dictionary
 
         // initial condtions
         np::ndarray u0;
+
+        // initial condtions
+        np::ndarray recency_score;
 
         // constraint data
         // LHS
@@ -270,7 +278,7 @@ class OptimizeGeneral {
         
 
         // build reach objective function
-        LSExpression build_objective_function_reach()
+        LSExpression build_reach_expression()
         {
 
             LSModel model = localsolver.getModel();
@@ -279,7 +287,7 @@ class OptimizeGeneral {
 
             // keep track of shift in index for u[]
             int u_index_shift = 0;  
-
+            
             // loop over media plans
             for (int mp = 0; mp < num_media_plans; mp++)
             {
@@ -289,6 +297,9 @@ class OptimizeGeneral {
                 // extract the probability data array for the given media plan
                 np::ndarray const p_array= bp::extract<np::ndarray>(prob_data[media_plans[mp]]);
                 np::ndarray const w_array= bp::extract<np::ndarray>(weight_data[media_plans[mp]]);
+                
+                // get the media plan prority
+                double priority = bp::extract<double>(priorities_data[media_plans[mp]]);
 
                 // use wrapper for easy indexing
                 NumPyArrayData<double> p(p_array);
@@ -344,14 +355,32 @@ class OptimizeGeneral {
                 // subtract summation from 1.0
                 LSExpression reach_per_media_plan = model.createExpression(O_Sub, lsdouble(1.0), sum_Individuals);
 
-                // add the reach to the total reach
-                reach_objective.addOperand(reach_per_media_plan); 
+                // add the reach to the total reach, after weighting by priority
+                reach_objective.addOperand(model.createExpression(O_Prod, reach_per_media_plan, lsdouble(priority))); 
                 
                 // update u_index_shift for next block-matrix
                 u_index_shift += num_variables_in_media_plan;
             }
 
             return( reach_objective);
+        }
+
+        // build reach objective function
+        LSExpression build_recency_expression()
+        {
+            LSModel model = localsolver.getModel();
+
+            LSExpression recency_objective = model.createExpression(O_Sum);
+
+            for (int P = 0; P < num_variables; P++)
+            {
+                // extract the recency score for each decision variable
+                double r_P = bp::extract<double>(recency_score[P]);
+                LSExpression current_term = model.createExpression(O_Prod, u[P], lsdouble(r_P));
+                recency_objective.addOperand(current_term);
+            }
+            
+            return(recency_objective);
         }
 
 
@@ -367,10 +396,14 @@ class OptimizeGeneral {
                
                 //LSExpression TRP_objective =  build_objective_function_TRP();
                 //LSExpression linear_objective =  build_objective_function_linear();
-                LSExpression reach_objective =  build_objective_function_reach();
+
+                // build objective function
+                LSExpression reach_term   =  build_reach_expression();
+                LSExpression recency_term =  build_recency_expression();
+                LSExpression nonlinear_objective = model.createExpression(O_Sum, reach_term, recency_term);
 
                 // commit the objective function
-                model.addObjective(reach_objective, OD_Maximize);
+                model.addObjective(nonlinear_objective, OD_Maximize);
                 model.close();
 
                 // Local Solver settings
@@ -638,16 +671,20 @@ np::ndarray optimizeGeneral
     boost::python::dict   const & prob_data_pydict,           // python dictionary of viewership probability
     boost::python::dict   const & weight_data_pydict,         // python dictionary of weight data
     boost::python::dict   const & constraints_data_pydict,    // python dictionary of constraints data
+    boost::python::dict   const & priorities_data_pydict,     // python dictionary of priorities data
     np::ndarray const & u0,
+    np::ndarray const & recency,
     int const time_limit = 10,
     int const annealing_level = 0
 ) 
 {
-    std::cout << "\nSet up local solver to Maximize Gurobi Linear Problems" << std::endl;
+    std::cout << "\nSet up local solver to Maximize full reach" << std::endl;
     OptimizeGeneral model(prob_data_pydict, 
                           weight_data_pydict, 
                           constraints_data_pydict,
-                          u0
+                          priorities_data_pydict, 
+                          u0,
+                          recency
                           );
     std::cout << "\nsolving" << std::endl;
     model.solve(time_limit, annealing_level);
