@@ -19,12 +19,16 @@ class OptimizeGeneral {
         // constructor
         OptimizeGeneral
         (
-            boost::python::dict const & prob_data_pydict,        // python dictionary of viewership probability
-            boost::python::dict const & weight_data_pydict,      // python dictionary of weight data
-            boost::python::dict const & constraints_data_pydict, // python dictionary of constraints data
-            boost::python::dict const & priorities_data_pydict,  // python dictionary of priority data, keyed by media_plan_id
-            np::ndarray const & np_u0,                           // Initial Conditions
-            np::ndarray const & np_recency_score                 // recency score
+            boost::python::dict const & prob_data_pydict,           // python dictionary of viewership probability
+            boost::python::dict const & weight_data_pydict,         // python dictionary of weight data
+            boost::python::dict const & constraints_data_pydict,    // python dictionary of constraints data
+            boost::python::dict const & priorities_data_pydict,     // python dictionary of priority data, keyed by media_plan_id
+            np::ndarray         const & np_u0,                      // Initial Conditions
+            np::ndarray         const & np_recency_score,           // recency score
+            double              const   np_recency_power,           // recency power
+            np::ndarray         const & np_creative_duration_array, // integer array (0 or 1) of spot length data 
+            np::ndarray         const & np_durations_histogram,     // desired normailized histograms of creative durations
+            double              const   np_duration_power           // recency power 
         )
             : prob_data( prob_data_pydict)                // extract the python dict to a c++ boost::python::dict
             , weight_data( weight_data_pydict)            // extract the python dict to a c++ boost::python::dict
@@ -33,6 +37,10 @@ class OptimizeGeneral {
             , media_plans( prob_data.keys())                              
             , u0( np_u0)
             , recency_score(np_recency_score)
+            , recency_power(np_recency_power)
+            , creative_duration_array(np_creative_duration_array)
+            , durations_histogram( np_durations_histogram)
+            , duration_power(np_duration_power)
             , constraint_lhs_index       (bp::extract<np::ndarray>(constraints_data["lhs_index"]))
             , constraint_lhs_variable_id (bp::extract<np::ndarray>(constraints_data["lhs_variable_id"]))      
             , constraint_lhs_coeff       (bp::extract<np::ndarray>(constraints_data["lhs_coeff"]))
@@ -72,7 +80,13 @@ class OptimizeGeneral {
 
         // initial condtions
         np::ndarray recency_score;
-
+        double recency_power; 
+        
+        // creative duration data
+        np::ndarray const creative_duration_array;  // 2D array, row index for media plan, column for duration
+        np::ndarray const durations_histogram;     // 2D array, row index for media plan, column for duration
+        double duration_power; 
+        
         // constraint data
         // LHS
         np::ndarray constraint_lhs_index; 
@@ -277,9 +291,10 @@ class OptimizeGeneral {
         }
         
 
-        // build reach objective function
+        // build reach objective component
         LSExpression build_reach_expression()
         {
+            std::cout << "building reach component of objective function"  << std::endl;
 
             LSModel model = localsolver.getModel();
 
@@ -348,6 +363,7 @@ class OptimizeGeneral {
                 // print for checking
                 std::cout << "media_plan_id : " << media_plan_id << std::endl;
                 std::cout << "\t" << possible_universe <<  " possible_universe" << std::endl;
+                std::cout << "\tpriority = " << priority << std::endl;
                 
                 // divide by target universe
                 sum_Individuals = model.createExpression(O_Div, sum_Individuals, lsdouble(possible_universe));
@@ -361,28 +377,160 @@ class OptimizeGeneral {
                 // update u_index_shift for next block-matrix
                 u_index_shift += num_variables_in_media_plan;
             }
+            
+            std::cout << "done\n\n" << std::endl;
 
             return( reach_objective);
         }
 
-        // build reach objective function
+        // build recency objective component
         LSExpression build_recency_expression()
         {
+            std::cout << "building recency component of objective function"  << std::endl;
+            std::cout << "\trecency power = " << recency_power <<  std::endl;
+
             LSModel model = localsolver.getModel();
 
             LSExpression recency_objective = model.createExpression(O_Sum);
-
-            for (int P = 0; P < num_variables; P++)
-            {
-                // extract the recency score for each decision variable
-                double r_P = bp::extract<double>(recency_score[P]);
-                LSExpression current_term = model.createExpression(O_Prod, u[P], lsdouble(r_P));
-                recency_objective.addOperand(current_term);
-            }
             
+
+            // keep track of shift in index for u[]
+            int u_index_shift = 0;  
+            
+            // loop over media plans
+            for (int mp = 0; mp < num_media_plans; mp++)
+            {
+                // media plan id
+                int media_plan_id = bp::extract<int>(media_plans[mp]);
+
+                // extract the probability data array for the given media plan
+                np::ndarray const p_array= bp::extract<np::ndarray>(prob_data[media_plans[mp]]);
+
+                // extract the probability data array for the given media plan
+                int num_variables_in_media_plan   = p_array.shape(1); 
+
+                // for each media plan, compute reency score
+                LSExpression recency_per_media_plan = model.createExpression(O_Sum);
+
+                for (int P = 0; P < num_variables_in_media_plan; P++)
+                {
+                    // extract the recency score, times priority, for each decision variable
+                    double r_P = bp::extract<double>(recency_score[P]);
+                    LSExpression current_term = model.createExpression(O_Prod, u[P], lsdouble(r_P));
+                    recency_per_media_plan.addOperand(current_term);
+                }
+
+                // mulitply by priority!
+                double priority = bp::extract<double>(priorities_data[media_plans[mp]]);
+                recency_per_media_plan = model.createExpression(O_Prod, recency_per_media_plan, lsdouble(priority)); 
+
+                // print for checking
+                std::cout << "media_plan_id : " << media_plan_id << std::endl;
+                std::cout << "\tpriority = " << priority << std::endl;
+                
+                // add the reach to the total reach, after weighting by priority
+                recency_objective.addOperand(recency_per_media_plan); 
+                
+                // update u_index_shift for next block-matrix
+                u_index_shift += num_variables_in_media_plan;
+            }
+
+            std::cout << "done\n\n" << std::endl;
+
             return(recency_objective);
         }
 
+        // build creative duration expression
+        LSExpression build_creative_duration_expression()
+        {
+            std::cout << "building creative_duration component of objective function"  << std::endl;
+            std::cout << "\tduration power = " << duration_power <<  std::endl;
+
+            LSModel model = localsolver.getModel();
+
+            LSExpression creative_duration_objective = model.createExpression(O_Sum);
+            
+            // use wrapper for easy indexing
+            NumPyArrayData<long> f_array(creative_duration_array);      // f data tags the creative duration
+            NumPyArrayData<double> n_desired(durations_histogram);    // n_true is the desired histogram
+
+            // helper variaables
+            size_t num_media_plans = bp::len(media_plans);
+            size_t num_durations   = creative_duration_array.shape(1);
+
+            // keep track of shift in index for u[]
+            int u_index_shift = 0;  
+            
+            // loop over media plans
+            for (int mp = 0; mp < num_media_plans; mp++)
+            {
+                // get the media plan's priority 
+                double priority = bp::extract<double>(priorities_data[media_plans[mp]]);
+
+                // extract the probability data array for the given media plan
+                np::ndarray const p_array= bp::extract<np::ndarray>(prob_data[media_plans[mp]]);
+
+                // extract the probability data array for the given media plan
+                int num_variables_in_media_plan   = p_array.shape(1); 
+
+                int P_start = u_index_shift;
+                int P_stop  = P_start + num_variables_in_media_plan;
+
+                // store the "numerators"
+                std::vector<LSExpression> num(num_durations, model.createExpression(O_Sum));
+
+                // store the "denominator
+                LSExpression den = model.createExpression(O_Sum);
+                den = model.createExpression(O_Sum, model.createConstant(lsdouble(1.0e-9)), den);
+
+                for (int P = P_start; P < P_stop; P++)
+                {
+                    // update denominator
+                    den.addOperand(u[P]); 
+
+                    // for each duration, update numerator
+                    for (int d = 0; d < num_durations; d++)
+                    {
+                        num[d].addOperand(model.createExpression(O_Prod, u[P], lsdouble(f_array(P,d))));
+                    }
+                }
+
+                // for each media plan, compute reency score
+                LSExpression score_per_media_plan = model.createExpression(O_Sum);
+
+                // now that the histogram is built, construct store
+                for (int d = 0; d < num_durations; d++)
+                {
+                    LSExpression n_hat       = model.createExpression(O_Div, num[d], den);
+                    LSExpression n_diff      = model.createExpression(O_Sub, n_hat, lsdouble(n_desired(mp, d)));
+                    LSExpression abs_n_diff  = model.createExpression(O_Abs, n_diff); 
+
+                    score_per_media_plan.addOperand(abs_n_diff);
+                }
+
+                // make positive
+                score_per_media_plan = model.createExpression(O_Prod,score_per_media_plan, lsdouble(-0.5));
+                score_per_media_plan = model.createExpression(O_Sum, model.createConstant(lsdouble(1.0)), score_per_media_plan);
+
+                // add the score for each media plan to the full traffic plan solution
+                // scaled by priority
+                score_per_media_plan = model.createExpression(O_Prod,score_per_media_plan, lsdouble(priority));
+                creative_duration_objective.addOperand(score_per_media_plan); 
+                
+                // update u_index_shift for next block-matrix
+                u_index_shift += num_variables_in_media_plan;
+            }
+
+
+            // normalize by the number of media plans
+            // add 1 to force it to be postive
+            double factor = 1.0/static_cast<double>(num_media_plans);
+            creative_duration_objective = model.createExpression(O_Prod,creative_duration_objective, lsdouble(factor));
+            
+            std::cout << "done\n\n" << std::endl;
+            return(creative_duration_objective);
+        }
+        
 
         // solver the model
         void solve(int time_limit, int annealing_level) {
@@ -399,11 +547,23 @@ class OptimizeGeneral {
 
                 // build objective function
                 LSExpression reach_term   =  build_reach_expression();
+
+                // recency
                 LSExpression recency_term =  build_recency_expression();
-                LSExpression nonlinear_objective = model.createExpression(O_Sum, reach_term, recency_term);
+                recency_term              =  model.createExpression(O_Prod, recency_term, lsdouble(recency_power));
+
+                // creative duration
+                LSExpression creative_duration_term =  build_creative_duration_expression();
+                creative_duration_term =  model.createExpression(O_Prod,creative_duration_term, lsdouble(duration_power));
+
+
+                LSExpression nonlinear_objective = model.createExpression(O_Sum, reach_term, 
+                                                                                 recency_term,
+                                                                                 creative_duration_term);
 
                 // commit the objective function
-                model.addObjective(nonlinear_objective, OD_Maximize);
+                //model.addObjective(nonlinear_objective, OD_Maximize);
+                model.addObjective(creative_duration_term, OD_Maximize);
                 model.close();
 
                 // Local Solver settings
@@ -672,10 +832,14 @@ np::ndarray optimizeGeneral
     boost::python::dict   const & weight_data_pydict,         // python dictionary of weight data
     boost::python::dict   const & constraints_data_pydict,    // python dictionary of constraints data
     boost::python::dict   const & priorities_data_pydict,     // python dictionary of priorities data
-    np::ndarray const & u0,
-    np::ndarray const & recency,
-    int const time_limit = 10,
-    int const annealing_level = 0
+    np::ndarray           const & u0,                         // initial condtions
+    np::ndarray           const & recency,
+    double                const & recency_power,
+    np::ndarray           const & creative_duration_array,    // integer array (0 or 1) of spot length data 
+    np::ndarray           const & durations_histogram,        // desired normailized histograms of creative durations
+    double                const   duration_power, 
+    int                   const   time_limit = 10,
+    int                   const   annealing_level = 0
 ) 
 {
     std::cout << "\nSet up local solver to Maximize full reach" << std::endl;
@@ -684,7 +848,11 @@ np::ndarray optimizeGeneral
                           constraints_data_pydict,
                           priorities_data_pydict, 
                           u0,
-                          recency
+                          recency, 
+                          recency_power, 
+                          creative_duration_array,
+                          durations_histogram, 
+                          duration_power
                           );
     std::cout << "\nsolving" << std::endl;
     model.solve(time_limit, annealing_level);
