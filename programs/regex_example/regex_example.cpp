@@ -50,14 +50,6 @@ std::ostream& operator << (std::ostream& out, const MediaPlanInfo& mp_info)
     return out;
 }
 
-// helpers:
-std::string strip_leading_zero(const std::string& str)
-{
-    std::string result(str);
-    boost::replace_first(result, "0", ""); 
-    return result;
-}
-
 // class implementation (to put in cpp file eventually):
 MediaPlanInfo::MediaPlanInfo(const std::string mp_info_str)
     : orig_str(mp_info_str) 
@@ -84,7 +76,7 @@ MediaPlanInfo::MediaPlanInfo(const std::string mp_info_str)
         throw std::runtime_error("[MediaPlanInfo] Error : could not match media plan string"); 
     } 
 
-    // fill attributes
+    // fill attributes:
     try
     {
         id                = boost::lexical_cast<unsigned int>(match[1 ].str());
@@ -103,7 +95,7 @@ MediaPlanInfo::MediaPlanInfo(const std::string mp_info_str)
     }
     catch (boost::bad_lexical_cast& e)
     {
-        // print better error messege
+        // better error messege
         std::cerr << "[MediaPlanInfo] Error : lexical cast failed in constructor\n"; 
         throw e;
     }
@@ -124,9 +116,9 @@ try
     }
     return 0;
 }
-catch (std::regex_error& e)
+catch (std::exception& e)
 {
     // Syntax error in the regular expression
-    std::cout << "[regex error]" << e.what() << std::endl;
+    std::cout << "[main error]" << e.what() << std::endl;
 }
 
