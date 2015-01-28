@@ -31,22 +31,22 @@ class MediaPlanInfo
 // non-members:
 std::ostream& operator << (std::ostream& out, const MediaPlanInfo& mp_info) 
 {
-    out << "MediaPlanInfo"
-        << "{orig_str : '"          << mp_info.orig_str << "'"
-        << ", id : "                << mp_info.id
-        << ", inventory_id : "      << mp_info.inventory_id
-        << ", day_part : "          << mp_info.day_part
-        << ", day_part_num : "      << mp_info.day_part_num
-        << ", year : "              << mp_info.year
-        << ", month : "             << mp_info.month
-        << ", day : "               << mp_info.day
-        << ", hour : "              << mp_info.hour
-        << ", min : "               << mp_info.min
-        << ", sec : "               << mp_info.sec
-        << ", creative_id : "       << mp_info.creative_id
-        << ", creative_duration : " << mp_info.creative_duration
-        << ", var_type : "          << mp_info.var_type
-        << "}";
+    out << "MediaPlanInfo{"
+        << "\n    orig_str          : '" << mp_info.orig_str << "'"
+        << "\n    id                : "  << mp_info.id
+        << "\n    inventory_id      : "  << mp_info.inventory_id
+        << "\n    day_part          : "  << mp_info.day_part
+        << "\n    day_part_num      : "  << mp_info.day_part_num
+        << "\n    year              : "  << mp_info.year
+        << "\n    month             : "  << mp_info.month
+        << "\n    day               : "  << mp_info.day
+        << "\n    hour              : "  << mp_info.hour
+        << "\n    min               : "  << mp_info.min
+        << "\n    sec               : "  << mp_info.sec
+        << "\n    creative_id       : "  << mp_info.creative_id
+        << "\n    creative_duration : "  << mp_info.creative_duration
+        << "\n    var_type          : "  << mp_info.var_type
+        << "\n}";
     return out;
 }
 
