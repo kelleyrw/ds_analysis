@@ -118,7 +118,6 @@ try
 }
 catch (std::exception& e)
 {
-    // Syntax error in the regular expression
     std::cout << "[main error]" << e.what() << std::endl;
 }
 
