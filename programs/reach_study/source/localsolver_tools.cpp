@@ -508,9 +508,9 @@ class OptimizeGeneral {
                     score_per_media_plan.addOperand(abs_n_diff);
                 }
 
-                // make positive
-                score_per_media_plan = model.createExpression(O_Prod,score_per_media_plan, lsdouble(-0.5));
-                score_per_media_plan = model.createExpression(O_Sum, model.createConstant(lsdouble(1.0)), score_per_media_plan);
+                //// make positive
+                //score_per_media_plan = model.createExpression(O_Prod,score_per_media_plan, lsdouble(-0.5));
+                //score_per_media_plan = model.createExpression(O_Sum, model.createConstant(lsdouble(1.0)), score_per_media_plan);
 
                 // add the score for each media plan to the full traffic plan solution
                 // scaled by priority
@@ -524,8 +524,8 @@ class OptimizeGeneral {
 
             // normalize by the number of media plans
             // add 1 to force it to be postive
-            double factor = 1.0/static_cast<double>(num_media_plans);
-            creative_duration_objective = model.createExpression(O_Prod,creative_duration_objective, lsdouble(factor));
+            // double factor = 1.0/static_cast<double>(num_media_plans);
+            //creative_duration_objective = model.createExpression(O_Prod,creative_duration_objective, lsdouble(factor));
             
             std::cout << "done\n\n" << std::endl;
             return(creative_duration_objective);
@@ -562,7 +562,7 @@ class OptimizeGeneral {
                                                                                  creative_duration_term);
 
                 // commit the objective function
-                //model.addObjective(nonlinear_objective, OD_Maximize);
+                // model.addObjective(nonlinear_objective, OD_Maximize);
                 model.addObjective(creative_duration_term, OD_Maximize);
                 model.close();
 
