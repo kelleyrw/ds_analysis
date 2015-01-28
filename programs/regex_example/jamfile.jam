@@ -1,0 +1,18 @@
+# jamfile root example 
+# -------------------------------------------------------------------- #
+
+exe regex_example
+ : # sources
+   ./regex_example.cpp
+   # dependent packages
+   /boost//headers/<link>static
+ : # requirements
+ : # default-build
+ : # usage-requirements
+ ;
+
+# install libs/exes
+# -------------------------------------------------------------- #
+
+default-install regex_example ;
+
