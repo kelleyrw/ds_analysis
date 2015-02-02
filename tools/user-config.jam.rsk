@@ -40,6 +40,13 @@
 
 # Configure gcc (default version).
 # using gcc ;
+# using darwin
+#   : c++11 
+#   : "g++" 
+#   : <cxxflags>-std=c++11 <cxxflags>-stdlib=libstdc++ ; 
+
+# Configure clang (default version).
+# using gcc ;
 using clang-darwin
   : c++11 
   : "clang++" 

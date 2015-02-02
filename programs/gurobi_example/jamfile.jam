@@ -7,7 +7,6 @@ exe gurobi_example
    # dependent packages
    /gurobi56
  : # requirements
-   <include>$(GUROBI_PATH)/include
  : # default-build
  : # usage-requirements
  ;

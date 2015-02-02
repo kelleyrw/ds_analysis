@@ -429,8 +429,15 @@ class OptimizeGeneral {
                 // for each media plan, compute reency score
                 LSExpression recency_per_media_plan = model.createExpression(O_Sum);
 
+                // set up for loop
+                int P_start = u_index_shift;
+                int P_stop  = P_start + num_variables_in_media_plan;
 
-                for (int P = 0; P < num_variables_in_media_plan; P++)
+                std::cout << "\tP_start: " << P_start;
+                std::cout << "\tP_stop: "  << P_stop  << std::endl;
+
+                // loop over decision variables
+                for (int P = P_start; P < P_stop; P++)
                 {
 
                     // extract the recency score, times priority, for each decision variable

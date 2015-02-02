@@ -1,10 +1,12 @@
 # gurobi 5.63 jamfile 
+# gurobi 5.63 jamfile
 
 project gurobi56
-  : usage-requirements
+: usage-requirements
     <include>$(GUROBI_PATH)/include
-  ;
+    <linkflags>-stdlib=libstdc++ 
+    ;
 
 # dynamic libs
-lib libgurobi56.so      : : <name>gurobi56 <search>$(GUROBI_PATH)/lib ;
-lib libgurobi_g++4.2.a : : <name>gurobi56 <search>$(GUROBI_PATH)/lib ;
+lib libgurobi_c++ : : <name>gurobi_c++ <search>$(GUROBI_PATH)/lib ;
+lib libgurobi56   : : <name>gurobi56   <search>$(GUROBI_PATH)/lib ;
