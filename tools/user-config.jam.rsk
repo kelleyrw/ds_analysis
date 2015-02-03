@@ -39,18 +39,13 @@
 # ------------------
 
 # Configure gcc (default version).
-# using gcc ;
-# using darwin
-#   : c++11 
-#   : "g++" 
-#   : <cxxflags>-std=c++11 <cxxflags>-stdlib=libstdc++ ; 
+using darwin ;
 
 # Configure clang (default version).
-# using gcc ;
-using clang-darwin
-  : c++11 
-  : "clang++" 
-  : <cxxflags>-std=c++11 <cxxflags>-stdlib=libc++ ; 
+#using clang-darwin
+#  : c++11 
+#  : "clang++" 
+#  : <cxxflags>-std=c++11 <cxxflags>-stdlib=libc++ ; 
 
 # Configure specific gcc version, giving alternative name to use.
 # using gcc : 3.2 : g++-3.2 ;
