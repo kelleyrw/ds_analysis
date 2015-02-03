@@ -77,6 +77,10 @@ use-project /boost/numpy       : ./external_libs/boost_numpy ;
 path-constant LOCALSOLVER_PATH : /opt/localsolver_4_5 ;
 use-project localsolver        : ./external_libs/localsolver ;
 
+# gurobi 5.63: http://www.gurobi.com/
+path-constant GUROBI_PATH : /Library/gurobi563/mac64 ;
+use-project gurobi56      : ./external_libs/gurobi56 ;
+
 # ROOT
 #local rootsys = [ os.environ ROOTSYS ] ;
 #path-constant ROOT_PATH : $(rootsys) ;

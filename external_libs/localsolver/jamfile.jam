@@ -1,4 +1,4 @@
-# localsovler jamfile 
+# localsolver jamfile 
 
 project localsolver
   : usage-requirements

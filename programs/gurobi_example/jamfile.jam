@@ -1,0 +1,17 @@
+# jamfile gurobi example 
+# -------------------------------------------------------------------- #
+
+exe gurobi_example
+ : # sources
+   ./source/mip1_c++.cpp
+   # dependent packages
+   /gurobi56
+ : # requirements
+ : # default-build
+ : # usage-requirements
+ ;
+
+# install libs/exes
+# -------------------------------------------------------------- #
+
+default-install gurobi_example ;
