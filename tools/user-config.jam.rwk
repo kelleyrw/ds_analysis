@@ -38,12 +38,18 @@
 # GCC configuration.
 # ------------------
 
-# Configure gcc (default version).
-# using gcc ;
-using clang-darwin
-  : c++11 
-  : "clang++" 
-  : <cxxflags>-std=c++11 <cxxflags>-stdlib=libc++ ; 
+# Configure clang
+#using clang-darwin
+#  : c++11 
+#  : "clang++" 
+#  : <cxxflags>-std=c++11 <cxxflags>-stdlib=libc++ ; 
+  #: <cxxflags>-std=c++11 <cxxflags>-stdlib=libstdc++ <linkflags>-stdlib=libstdc++ ; 
+
+# Configure clang
+using darwin ;
+#  : c++11 
+#  : "g++" 
+#  : <cxxflags>-std=c++11 ; 
 
 # Configure specific gcc version, giving alternative name to use.
 # using gcc : 3.2 : g++-3.2 ;
@@ -110,3 +116,11 @@ using python
 #  : /usr/local/Cellar/python3/3.4.2_1/Frameworks/Python.framework/Versions/3.4/include/python3.4m
 #  : /usr/local/Cellar/python3/3.4.2_1/Frameworks/Python.framework/Versions/3.4/lib
 #  ;
+
+# Hombrew python 2.7
+#using python
+# : 2.7
+# : /usr/local/bin/python 
+# : /usr/local/Cellar/python/2.7.9/Frameworks/Python.framework/Versions/2.7/include/python2.7
+# : /usr/local/Cellar/python/2.7.9/Frameworks/Python.framework/Versions/2.7/lib
+# ;

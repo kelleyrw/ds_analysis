@@ -4,9 +4,10 @@
 project gurobi56
 : usage-requirements
     <include>$(GUROBI_PATH)/include
+    <cxxflags>-stdlib=libstdc++ 
     <linkflags>-stdlib=libstdc++ 
     ;
 
 # dynamic libs
-lib libgurobi_c++ : : <name>gurobi_c++ <search>$(GUROBI_PATH)/lib ;
 lib libgurobi56   : : <name>gurobi56   <search>$(GUROBI_PATH)/lib ;
+lib libgurobi_c++ : : <name>gurobi_c++ <search>$(GUROBI_PATH)/lib ;
