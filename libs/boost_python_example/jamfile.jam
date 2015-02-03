@@ -40,6 +40,7 @@ python-extension dict_example
    /boost/python//boost_python
    /boost/numpy//boost_numpy
  : # requirements
+   <include>./include
  : # default-build
  : # usage-requirements
  ;
