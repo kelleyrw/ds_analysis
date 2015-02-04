@@ -33,6 +33,8 @@ class OptimizeGurobi {
         {
             std::cout << "instantating Local Solver: Optimize Linear"  << std::endl;
             std::cout << "number of variables: " << num_variables << std::endl;
+
+            GRBEvn =  
         }
 
         /* Number of decision variables. */
@@ -231,5 +233,5 @@ np::ndarray optimizeGurobi
 
 BOOST_PYTHON_MODULE(gurobi_tools) {
     np::initialize();  // have to put this in any module that uses Boost.NumPy
-    bp::def("optimizeGurobi", optimizeLinear);
+    bp::def("optimizeGurobi", optimizeGurobi);
 }

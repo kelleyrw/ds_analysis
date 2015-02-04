@@ -38,4 +38,3 @@ lib boost_numpy
   <conditional>@numpy-includes
   ;
 
-default-install boost_numpy ;
