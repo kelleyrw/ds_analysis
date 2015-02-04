@@ -188,13 +188,13 @@ class OptimizeGeneral {
 
                 switch (sense_int)
                 {
-                  case -1:
+                  case -2:
                      sense = LSOperator(O_Leq);
                      break;
                   case 0:
                      sense = LSOperator(O_Eq);
                      break;
-                  case 1:
+                  case 2:
                      sense = LSOperator(O_Geq);
                      break;
                   default:
@@ -599,8 +599,7 @@ class OptimizeGeneral {
 
                 // add the terms together
                 LSExpression nonlinear_objective = model.createExpression(O_Sum, reach_term, 
-                                                                                 recency_term,
-                                                                                 creative_duration_term);
+                                                                                 recency_term);
 
                 // commit the objective function
                 model.addObjective(nonlinear_objective, OD_Maximize);
