@@ -1,0 +1,19 @@
+# jamfile localsover example 
+# -------------------------------------------------------------------- #
+
+python-extension gurobi_tools
+ : # sources
+   ./source/gurobi_tools.cpp
+   # dependent packages
+   /gurobi56
+   /boost/python//boost_python
+   /boost/numpy//boost_numpy
+ : # requirements
+   <include>./include
+ : # default-build
+ : # usage-requirements
+ ;
+
+# install libs/exes
+# -------------------------------------------------------------- #
+default-install gurobi_tools ;
