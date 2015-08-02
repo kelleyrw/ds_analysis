@@ -1,5 +1,6 @@
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
+#include <boost/numpy.hpp>
 
 char const* greet()
 {

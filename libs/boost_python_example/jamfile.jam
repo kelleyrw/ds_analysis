@@ -4,8 +4,10 @@ python-extension hello_ext
  : # sources
    ./source/hello.cpp 
    # dependent packages
-   #/boost//python
+   /gurobi56
+   /localsolver
    /boost/python//boost_python
+   /boost/numpy//boost_numpy
  : # requirements
  : # default-build
  : # usage-requirements
@@ -15,7 +17,8 @@ python-extension example
  : # sources
    ./source/wrap.cpp 
    # dependent packages
-   #/boost//python
+   /gurobi56
+   /localsolver
    /boost/python//boost_python
    /boost/numpy//boost_numpy
  : # requirements

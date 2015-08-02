@@ -22,9 +22,9 @@ import type ;
 # Configure specific Python version.
 #using python
 #  : 2.7 
-#  : /Applications/Canopy.app/appdata/canopy-1.4.1.1975.macosx-x86_64/Canopy.app/Contents/bin/python
-#  : /Applications/Canopy.app/appdata/canopy-1.4.1.1975.macosx-x86_64/Canopy.app/Contents/include/python2.7
-#  : /Applications/Canopy.app/appdata/canopy-1.4.1.1975.macosx-x86_64/Canopy.app/Contents/lib
+#  : /Applications/Canopy.app/appdata/canopy-1.5.2.2785.macosx-x86_64/Canopy.app/Contents/bin/python
+#  : /Applications/Canopy.app/appdata/canopy-1.5.2.2785.macosx-x86_64/Canopy.app/Contents/include/python2.7
+#  : /Applications/Canopy.app/appdata/canopy-1.5.2.2785.macosx-x86_64/Canopy.app/Contents/lib
 #  ;
 
 # ----------------------------------------------------------------------#
@@ -66,8 +66,8 @@ local boost_current = [ os.environ BOOST_ROOT ] ;
 use-project /boost : $(boost_current) ;
 
 # PyUblas
-#path-constant PYUBLAS_PATH : ./external_libs/pyublas/v2013.1 ;
-#use-project /pyublas       : ./external_libs/pyublas ;
+path-constant PYUBLAS_PATH : ./external_libs/pyublas/v2013.1 ;
+use-project /pyublas       : ./external_libs/pyublas ;
 
 # Boost.Numpy: https://github.com/ndarray/Boost.NumPy
 path-constant BOOST_NUMPY_PATH : ./external_libs/boost_numpy/Boost.Numpy ;

@@ -31,10 +31,12 @@ lib boost_numpy
   <include>$(BOOST_NUMPY_PATH)
   <library>/boost/python//boost_python
   <conditional>@numpy-includes
+  #<define>NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
   : # default build
   <link>shared
   : # usage requirements
   <include>$(BOOST_NUMPY_PATH)
   <conditional>@numpy-includes
+  <library>/boost/python//boost_python
   ;
 
